@@ -6,16 +6,97 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        String symbols = scanner.next();
+        String symbols = scanner.nextLine();
 
         String[][] field = new String[3][3];
+
+        String[][] newField = fillField(symbols, field);
+        displayField(newField);
+
+        int[] counts = analyseField(newField);
+        boolean misCount = false;
+        int xCount = counts[0];
+        int oCount = counts[1];
+        int emptyCount = counts[2];
+        if (xCount - oCount > 1 || oCount - xCount > 1) {
+            misCount = true;
+        }
+
+        //checkWinner(newField, emptyCount, misCount);
+
+        String userMove = getMove(newField, scanner);
+        int col = Integer.parseInt(userMove.substring(0,1));
+        int row = Integer.parseInt(userMove.substring(2,3));
+        newField[3-row][col-1] = "X";
+        displayField(newField);
+    }
+
+    public static String getMove(String[][] field, Scanner scanner) {
+        boolean validMove;
+        do {
+            validMove = true;
+            String userMove = scanner.nextLine();
+            String col = userMove.substring(0,1);
+            String row = "";
+            if (userMove.length() >=3) {
+                row = userMove.substring(2,3);
+            }
+            if (col.equals("1") || col.equals("2") || col.equals("3")) {
+            } else {
+                validMove = false;
+            }
+            if (row.equals("1") || row.equals("2") || row.equals("3")) {
+            } else {
+                validMove = false;
+            }
+            if (validMove) {
+                int col1 = Integer.parseInt(userMove.substring(0,1));
+                int row1 = Integer.parseInt(userMove.substring(2,3));
+                String currentCell = field[3-row1][col1-1];
+                if (currentCell.equals("X") || currentCell.equals("O")) {
+                    validMove = false;
+                }
+            }
+            if (!validMove) {
+                System.out.println("not a valid move, try again");
+            } else {
+                return userMove;
+            }
+        } while (!validMove);
+
+        return "";
+    }
+
+    public static void displayField(String[][] field) {
+        System.out.println("---------");
+        System.out.println("| " + field[0][0] + " " + field[0][1] + " " + field[0][2] + " |");
+        System.out.println("| " + field[1][0] + " " + field[1][1] + " " + field[1][2] + " |");
+        System.out.println("| " + field[2][0] + " " + field[2][1] + " " + field[2][2] + " |");
+        System.out.println("---------");
+        //System.out.println("");
+    }
+
+    public static String[][] fillField(String symbols, String[][] field) {
         int i = 0;
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                String thisChar = String.valueOf(symbols.charAt(i));
+                field[j][k] = thisChar;
+                i++;
+            }
+        }
+
+        return field;
+    }
+
+    public static int[] analyseField(String[][] field) {
+        int[] counts = new int[3];
         int xCount = 0;
         int oCount = 0;
         int emptyCount = 0;
         for (int j = 0; j < 3; j++) {
             for (int k = 0; k < 3; k++) {
-                String thisChar = String.valueOf(symbols.charAt(i));
+                String thisChar = field[j][k];
                 if (thisChar.equals("X")) {
                     xCount++;
                 } else {
@@ -25,27 +106,17 @@ public class Main {
                         emptyCount++;
                     }
                 }
-                field[j][k] = thisChar;
-                i++;
             }
         }
 
-        System.out.println("---------");
-        System.out.println("| " + field[0][0] + " " + field[0][1] + " " + field[0][2] + " |");
-        System.out.println("| " + field[1][0] + " " + field[1][1] + " " + field[1][2] + " |");
-        System.out.println("| " + field[2][0] + " " + field[2][1] + " " + field[2][2] + " |");
-        System.out.println("---------");
-        System.out.println("");
+        counts[0] = xCount;
+        counts[1] = oCount;
+        counts[2] = emptyCount;
 
-        //System.out.println("xcount=" +xCount);
-        //System.out.println("ocount=" +oCount);
-        //System.out.println("emptycount=" +emptyCount);
+        return counts;
+    }
 
-        boolean misCount = false;
-        if (xCount - oCount > 1 || oCount - xCount > 1) {
-            misCount = true;
-        }
-
+    public static void checkWinner(String[][] field, int emptyCount, boolean misCount) {
         String row1 = field[0][0] + field[0][1] + field[0][2];
         String row2 = field[1][0] + field[1][1] + field[1][2];
         String row3 = field[2][0] + field[2][1] + field[2][2];
@@ -66,10 +137,10 @@ public class Main {
             oWins = true;
         }
 
-        if (xWins == false && oWins == false && emptyCount > 0 && !misCount) {
+        if (!xWins && !oWins && emptyCount > 0 && !misCount) {
             System.out.println("Game not finished");
         } else {
-            if (xWins == false && oWins == false && emptyCount == 0) {
+            if (!xWins && !oWins && emptyCount == 0) {
                 System.out.println("Draw");
             } else {
                 if (xWins && oWins) {
@@ -87,5 +158,6 @@ public class Main {
                 }
             }
         }
+
     }
 }
