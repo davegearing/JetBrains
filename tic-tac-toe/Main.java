@@ -6,29 +6,43 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        String symbols = scanner.nextLine();
+        //String symbols = scanner.nextLine();
+        String symbols = "_________";   //empty field
 
         String[][] field = new String[3][3];
 
         String[][] newField = fillField(symbols, field);
         displayField(newField);
 
-        int[] counts = analyseField(newField);
-        boolean misCount = false;
-        int xCount = counts[0];
-        int oCount = counts[1];
-        int emptyCount = counts[2];
-        if (xCount - oCount > 1 || oCount - xCount > 1) {
-            misCount = true;
+        String theWinner = "";
+        for (int gameCount = 1 ;; gameCount++) {
+
+            int[] counts = analyseField(newField);
+            boolean misCount = false;
+            int xCount = counts[0];
+            int oCount = counts[1];
+            int emptyCount = counts[2];
+            if (xCount - oCount > 1 || oCount - xCount > 1) {
+                misCount = true;
+            }
+
+            String winner = "";
+            winner = checkWinner(newField, emptyCount, misCount);
+            if (!winner.equals("")) {
+                break;
+            }
+
+            String userMove = getMove(newField, scanner);
+            int col = Integer.parseInt(userMove.substring(0, 1));
+            int row = Integer.parseInt(userMove.substring(2, 3));
+            if (gameCount % 2 == 0) {
+                newField[3 - row][col - 1] = "O";
+            } else {
+                newField[3 - row][col - 1] = "X";
+            }
+
+            displayField(newField);
         }
-
-        //checkWinner(newField, emptyCount, misCount);
-
-        String userMove = getMove(newField, scanner);
-        int col = Integer.parseInt(userMove.substring(0,1));
-        int row = Integer.parseInt(userMove.substring(2,3));
-        newField[3-row][col-1] = "X";
-        displayField(newField);
     }
 
     public static String getMove(String[][] field, Scanner scanner) {
@@ -116,7 +130,7 @@ public class Main {
         return counts;
     }
 
-    public static void checkWinner(String[][] field, int emptyCount, boolean misCount) {
+    public static String checkWinner(String[][] field, int emptyCount, boolean misCount) {
         String row1 = field[0][0] + field[0][1] + field[0][2];
         String row2 = field[1][0] + field[1][1] + field[1][2];
         String row3 = field[2][0] + field[2][1] + field[2][2];
@@ -138,10 +152,11 @@ public class Main {
         }
 
         if (!xWins && !oWins && emptyCount > 0 && !misCount) {
-            System.out.println("Game not finished");
+            //System.out.println("Game not finished");
         } else {
             if (!xWins && !oWins && emptyCount == 0) {
                 System.out.println("Draw");
+                return "Z";
             } else {
                 if (xWins && oWins) {
                     System.out.println("Impossible");
@@ -151,13 +166,15 @@ public class Main {
                     } else {
                         if (xWins) {
                             System.out.println("X wins");
+                            return "X";
                         } else {
                             System.out.println("O wins");
+                            return "O";
                         }
                     }
                 }
             }
         }
-
+        return "";
     }
 }
